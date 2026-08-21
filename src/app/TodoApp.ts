@@ -9,6 +9,7 @@ export class TodoApp {
   private readonly addButton: HTMLButtonElement
   private readonly list: HTMLUListElement
   private readonly error: HTMLParagraphElement
+  private readonly deleteAllButton: HTMLButtonElement
   private readonly storage: TodoStorage
 
   constructor(
@@ -16,12 +17,14 @@ export class TodoApp {
     addButton: HTMLButtonElement,
     list: HTMLUListElement,
     error: HTMLParagraphElement,
+    deleteAllButton: HTMLButtonElement,
     storage: TodoStorage,
   ) {
     this.input = input
     this.addButton = addButton
     this.list = list
     this.error = error
+    this.deleteAllButton = deleteAllButton
     this.storage = storage
 
     this.addButton.addEventListener('click', () => this.addTodo())
@@ -31,6 +34,7 @@ export class TodoApp {
       }
     })
     this.input.addEventListener('input', () => this.clearError())
+    this.deleteAllButton.addEventListener('click', () => this.clearAll())
 
     this.todos.push(...this.storage.load())
     this.render()
@@ -71,6 +75,12 @@ export class TodoApp {
     }
 
     this.todos.splice(index, 1)
+    this.storage.save(this.todos)
+    this.render()
+  }
+
+  private clearAll(): void {
+    this.todos.splice(0, this.todos.length)
     this.storage.save(this.todos)
     this.render()
   }
