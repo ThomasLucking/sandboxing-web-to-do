@@ -63,6 +63,18 @@ export class TodoApp {
     this.render()
   }
 
+  private removeTodo(id: number): void {
+    const index = this.todos.findIndex((t) => t.id === id)
+
+    if (index === -1) {
+      return
+    }
+
+    this.todos.splice(index, 1)
+    this.storage.save(this.todos)
+    this.render()
+  }
+
   private showError(message: string): void {
     this.error.textContent = message
     this.error.hidden = false
@@ -92,7 +104,14 @@ export class TodoApp {
     const label = document.createElement('span')
     label.textContent = todo.text
 
-    item.append(checkbox, label)
+    const removeButton = document.createElement('button')
+    removeButton.type = 'button'
+    removeButton.className = 'remove-todo-button'
+    removeButton.textContent = '×'
+    removeButton.setAttribute('aria-label', `Remove "${todo.text}"`)
+    removeButton.addEventListener('click', () => this.removeTodo(todo.id))
+
+    item.append(checkbox, label, removeButton)
     return item
   }
 }
