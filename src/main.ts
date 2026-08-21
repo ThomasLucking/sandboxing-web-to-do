@@ -1,39 +1,28 @@
 import './style.css'
 import { TodoApp } from './app/TodoApp.ts'
+import { TodoListRenderer } from './app/TodoListRenderer.ts'
+import { TodoRepository } from './app/TodoRepository.ts'
+import { requireElement } from './dom/requireElement.ts'
 import { TodoStorage } from './storage/TodoStorage.ts'
 
-const input = document.querySelector<HTMLInputElement>('#todo-input')
-const dateInput = document.querySelector<HTMLInputElement>('#todo-date-input')
-const addButton = document.querySelector<HTMLButtonElement>('#add-todo-button')
-const list = document.querySelector<HTMLUListElement>('#todo-elements')
-const error = document.querySelector<HTMLParagraphElement>('#todo-error')
-const deleteAllButton = document.querySelector<HTMLButtonElement>('#delete-all')
-const overdueMessage =
-  document.querySelector<HTMLParagraphElement>('#overdue-message')
-
-if (
-  !input ||
-  !dateInput ||
-  !addButton ||
-  !list ||
-  !error ||
-  !deleteAllButton ||
-  !overdueMessage
-) {
-  throw new Error(
-    'Todo app failed to initialize: required DOM elements are missing.',
-  )
-}
+const input = requireElement<HTMLInputElement>('#todo-input')
+const dateInput = requireElement<HTMLInputElement>('#todo-date-input')
+const addButton = requireElement<HTMLButtonElement>('#add-todo-button')
+const list = requireElement<HTMLUListElement>('#todo-elements')
+const error = requireElement<HTMLParagraphElement>('#todo-error')
+const deleteAllButton = requireElement<HTMLButtonElement>('#delete-all')
+const overdueMessage = requireElement<HTMLParagraphElement>('#overdue-message')
 
 const storage = new TodoStorage()
+const repository = new TodoRepository(storage)
+const renderer = new TodoListRenderer(list, overdueMessage)
 
-new TodoApp(
+new TodoApp({
   input,
   dateInput,
   addButton,
-  list,
   error,
   deleteAllButton,
-  overdueMessage,
-  storage,
-)
+  repository,
+  renderer,
+})
