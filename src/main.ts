@@ -1,5 +1,6 @@
 import './style.css'
 import { TodoApp } from './app/TodoApp.ts'
+import { TodoStorage } from './storage/TodoStorage.ts'
 
 const input = document.querySelector<HTMLInputElement>('#todo-input')
 const addButton = document.querySelector<HTMLButtonElement>('#add-todo-button')
@@ -12,4 +13,6 @@ if (!input || !addButton || !list || !error) {
   )
 }
 
-new TodoApp(input, addButton, list, error)
+const storage = new TodoStorage()
+
+new TodoApp(input, addButton, list, error, storage)
