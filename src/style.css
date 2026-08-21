@@ -7,6 +7,10 @@
   --color-primary-hover: #2563eb;
   --color-error: #dc2626;
   --color-border: #e2e8f0;
+  --color-overdue: #dc2626;
+  --color-due-today: #ea580c;
+  --color-due-soon: #b45309;
+  --color-due-later: #15803d;
   --radius: 0.5rem;
 }
 
@@ -142,6 +146,24 @@ h1 {
   font-size: 0.8rem;
   color: var(--color-text-muted);
   white-space: nowrap;
+}
+
+.todo-due-date--overdue {
+  color: var(--color-overdue);
+  font-weight: 600;
+}
+
+.todo-due-date--today {
+  color: var(--color-due-today);
+  font-weight: 600;
+}
+
+.todo-due-date--soon {
+  color: var(--color-due-soon);
+}
+
+.todo-due-date--later {
+  color: var(--color-due-later);
 }
 
 .remove-todo-button {

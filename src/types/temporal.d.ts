@@ -13,6 +13,10 @@ declare namespace Temporal {
     static from(item: string): PlainDate
     static compare(one: PlainDate, two: PlainDate): number
     toString(): string
+    until(
+      other: PlainDate,
+      options?: { largestUnit?: string },
+    ): { days: number }
   }
 
   namespace Now {
