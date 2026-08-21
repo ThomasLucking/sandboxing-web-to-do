@@ -20,6 +20,22 @@ body {
   margin: 0;
 }
 
+#overdue-message {
+  justify-self: stretch;
+  width: 100%;
+  margin: 0;
+  padding: 1rem 1.5rem;
+  background-color: var(--color-overdue);
+  color: var(--color-surface);
+  font-size: 1.125rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+#overdue-message[hidden] {
+  display: none;
+}
+
 * {
   box-sizing: border-box;
   font-family: Helvetica, Arial, sans-serif;
