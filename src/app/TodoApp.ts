@@ -3,6 +3,7 @@ import type { TodoStorage } from '../storage/TodoStorage.ts'
 
 const EMPTY_TODO_ERROR = 'Please enter a to-do item before adding it.'
 const PAST_DUE_DATE_ERROR = 'Due date cannot be in the past.'
+const OVERDUE_MESSAGE = 'You have overdue to-dos that need attention.'
 
 export class TodoApp {
   private readonly todos: Todo[] = []
@@ -12,6 +13,7 @@ export class TodoApp {
   private readonly list: HTMLUListElement
   private readonly error: HTMLParagraphElement
   private readonly deleteAllButton: HTMLButtonElement
+  private readonly overdueMessage: HTMLParagraphElement
   private readonly storage: TodoStorage
 
   constructor(
@@ -21,6 +23,7 @@ export class TodoApp {
     list: HTMLUListElement,
     error: HTMLParagraphElement,
     deleteAllButton: HTMLButtonElement,
+    overdueMessage: HTMLParagraphElement,
     storage: TodoStorage,
   ) {
     this.input = input
@@ -29,6 +32,7 @@ export class TodoApp {
     this.list = list
     this.error = error
     this.deleteAllButton = deleteAllButton
+    this.overdueMessage = overdueMessage
     this.storage = storage
 
     this.addButton.addEventListener('click', () => this.addTodo())
@@ -128,6 +132,24 @@ export class TodoApp {
     this.list.replaceChildren(
       ...this.todos.map((todo) => this.createTodoElement(todo)),
     )
+    this.updateOverdueMessage()
+  }
+
+  private isOverdue(todo: Todo): boolean {
+    if (!todo.dueDate || todo.completed) {
+      return false
+    }
+
+    return (
+      Temporal.PlainDate.compare(todo.dueDate, Temporal.Now.plainDateISO()) < 0
+    )
+  }
+
+  private updateOverdueMessage(): void {
+    const hasOverdueTodo = this.todos.some((todo) => this.isOverdue(todo))
+
+    this.overdueMessage.hidden = !hasOverdueTodo
+    this.overdueMessage.textContent = hasOverdueTodo ? OVERDUE_MESSAGE : ''
   }
 
   private createTodoElement(todo: Todo): HTMLLIElement {
