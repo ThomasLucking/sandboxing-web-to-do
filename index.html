@@ -7,7 +7,15 @@
     <title>Web todolist project</title>
   </head>
   <body>
-    <h1>Web todolist app</h1>
+    <main>
+      <h1>Web todolist app</h1>
+      <p id="todo-error" hidden></p>
+      <div class="todo-form">
+        <input id="todo-input" type="text" placeholder="What needs to be done?" />
+        <button id="add-todo-button" type="button">Add</button>
+      </div>
+      <ul id="todo-elements"></ul>
+    </main>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
