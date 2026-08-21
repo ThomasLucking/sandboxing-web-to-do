@@ -1,4 +1,25 @@
-# Web todo template
+# Web todo list
+
+A simple, modern to-do list web app built with plain HTML, CSS and TypeScript
+(no frameworks or libraries). To-dos and categories are persisted through a
+hosted RESTful API rather than local storage, so your list is available
+wherever you open the app.
+
+## Features
+
+- Create to-dos with optional due dates and an optional category.
+- Mark to-dos as done/undone with a checkbox; completed items are shown with
+  strikethrough styling.
+- Remove individual to-dos, or clear the entire list with one click.
+- Live text search that filters the visible list as you type.
+- Due dates are color-coded by urgency (overdue, due today, due soon, due
+  later), and a banner appears at the top of the page whenever any to-do is
+  overdue.
+- Manage categories (name + color) in their own section: create, rename,
+  recolor and delete them. Assigning a category to a to-do colors that
+  to-do's border and shows the category name on the item.
+- All data (to-dos and categories) is stored on a remote REST API, with a
+  loading indicator and error messages for network issues.
 
 ## Prerequisites
 
@@ -7,27 +28,26 @@
 
 ## Setup
 
-1. Fork and clone this repository.
+1. Clone this repository.
 2. From your CLI, move to the project repository with `cd`.
 3. Install the dependencies with `pnpm i`.
+4. Start the dev server with `pnpm dev` and open [localhost:5173](http://localhost:5173/).
 
-That's all ! You are ready to go.
+That's all! You are ready to go.
 
-## How to develop with this template ?
+## Available scripts
 
-This template is based on [vite](https://vite.dev/), with some additional
-tooling. Here are the most important things :
+- `pnpm dev` — launch the development server on [localhost:5173](http://localhost:5173/).
+- `pnpm build` — type-check and build the production bundle into `dist/`.
+- `pnpm check-types` — run the [TypeScript](https://www.typescriptlang.org/) type checker.
+- `pnpm format` — format all project files with [biome](https://biomejs.dev/).
+- `pnpm lint` — run the biome linter.
 
-- Use `pnpm dev` command to launch the development server on [localhost:5173](http://localhost:5173/).
-- Use `pnpm check-types` to launch the [TypeScript](https://www.typescriptlang.org/) type checker. This will verify the project type correctness.
-- Use `pnpm format` to format all project files correctly.
-- Use `pnpm lint` to run the [biome](https://biomejs.dev/) linter, and catch some errors statically.
+Run `pnpm format` and `pnpm lint` before committing.
 
-These commands allow you to create good quality commits. Don't forget to lint and format before your commits.
+## Continuous integration & deployment
 
-## Continuous integration
+This repo includes two [GitHub Actions](https://docs.github.com/en/actions) workflows:
 
-This repo includes three [GitHub actions](https://docs.github.com/en/actions) :
-
-- One to automatically deploy the project to GitHub pages. This workflow executes on each commit in the main branch. **You must update the `base` field in the [vite.config.ts](./vite.config.ts) file to your repository name for this to work !!! And activate GitHub pages source to `GitHub Actions` in your repository settings**.
-- One to check the code formatting, linting and types, this one executes on pull requests.
+- One deploys the project to GitHub Pages automatically on every push to `main`.
+- One checks formatting, linting and types on every pull request.
