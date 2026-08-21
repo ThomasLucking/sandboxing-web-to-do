@@ -21,8 +21,9 @@ export class TodoRepository {
   async add(
     text: string,
     dueDate: Temporal.PlainDate | undefined,
+    categoryId: number | undefined,
   ): Promise<void> {
-    const todo = await this.api.create(text, dueDate)
+    const todo = await this.api.create(text, dueDate, categoryId)
     this.todos.push(todo)
   }
 

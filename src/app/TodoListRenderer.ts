@@ -1,3 +1,4 @@
+import type { Category } from '../models/Category.ts'
 import type { Todo } from '../models/Todo.ts'
 
 const OVERDUE_MESSAGE = 'You have overdue to-dos that need attention.'
@@ -16,7 +17,11 @@ export class TodoListRenderer {
     this.overdueMessage = overdueMessage
   }
 
-  render(todos: readonly Todo[], handlers: TodoListHandlers): void {
+  render(
+    todos: readonly Todo[],
+    categories: readonly Category[],
+    handlers: TodoListHandlers,
+  ): void {
     let hasOverdueTodo = false
 
     const elements = todos.map((todo) => {
@@ -28,7 +33,7 @@ export class TodoListRenderer {
         hasOverdueTodo = true
       }
 
-      return this.createTodoElement(todo, daysUntilDue, handlers)
+      return this.createTodoElement(todo, daysUntilDue, categories, handlers)
     })
 
     this.list.replaceChildren(...elements)
@@ -57,11 +62,21 @@ export class TodoListRenderer {
   private createTodoElement(
     todo: Todo,
     daysUntilDue: number | undefined,
+    categories: readonly Category[],
     handlers: TodoListHandlers,
   ): HTMLLIElement {
     const item = document.createElement('li')
     item.dataset.id = String(todo.id)
     item.classList.toggle('completed', todo.completed)
+
+    const category =
+      todo.categoryId !== undefined
+        ? categories.find((c) => c.id === todo.categoryId)
+        : undefined
+
+    if (category) {
+      item.style.borderColor = category.color
+    }
 
     const checkbox = document.createElement('input')
     checkbox.type = 'checkbox'
@@ -71,6 +86,7 @@ export class TodoListRenderer {
     const label = document.createElement('span')
     label.textContent = todo.text
 
+    const categoryParagraph = this.createCategoryLabelElement(category)
     const dueDateParagraph = this.createDueDateElement(todo, daysUntilDue)
 
     const removeButton = document.createElement('button')
@@ -80,8 +96,23 @@ export class TodoListRenderer {
     removeButton.setAttribute('aria-label', `Remove "${todo.text}"`)
     removeButton.addEventListener('click', () => handlers.onRemove(todo.id))
 
-    item.append(checkbox, label, dueDateParagraph, removeButton)
+    item.append(
+      checkbox,
+      label,
+      categoryParagraph,
+      dueDateParagraph,
+      removeButton,
+    )
     return item
+  }
+
+  private createCategoryLabelElement(
+    category: Category | undefined,
+  ): HTMLParagraphElement {
+    const paragraph = document.createElement('p')
+    paragraph.className = 'todo-category'
+    paragraph.textContent = category ? category.name : 'no category'
+    return paragraph
   }
 
   private createDueDateElement(

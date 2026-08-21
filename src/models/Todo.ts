@@ -5,12 +5,14 @@ export class Todo {
   readonly text: string
   completed: boolean
   readonly dueDate?: Temporal.PlainDate
+  readonly categoryId?: number
 
   constructor(
     text: string,
     id?: number,
     completed = false,
     dueDate?: Temporal.PlainDate,
+    categoryId?: number,
   ) {
     if (id === undefined) {
       this.id = nextId++
@@ -23,6 +25,7 @@ export class Todo {
     this.text = text
     this.completed = completed
     this.dueDate = dueDate
+    this.categoryId = categoryId
   }
 
   static hydrate(data: {
@@ -30,7 +33,14 @@ export class Todo {
     text: string
     completed: boolean
     dueDate?: Temporal.PlainDate
+    categoryId?: number
   }): Todo {
-    return new Todo(data.text, data.id, data.completed, data.dueDate)
+    return new Todo(
+      data.text,
+      data.id,
+      data.completed,
+      data.dueDate,
+      data.categoryId,
+    )
   }
 }
