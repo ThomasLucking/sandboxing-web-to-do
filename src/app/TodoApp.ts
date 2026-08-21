@@ -51,6 +51,18 @@ export class TodoApp {
     this.render()
   }
 
+  private toggleTodo(id: number): void {
+    const todo = this.todos.find((t) => t.id === id)
+
+    if (!todo) {
+      return
+    }
+
+    todo.completed = !todo.completed
+    this.storage.save(this.todos)
+    this.render()
+  }
+
   private showError(message: string): void {
     this.error.textContent = message
     this.error.hidden = false
@@ -69,8 +81,18 @@ export class TodoApp {
 
   private createTodoElement(todo: Todo): HTMLLIElement {
     const item = document.createElement('li')
-    item.textContent = todo.text
     item.dataset.id = String(todo.id)
+    item.classList.toggle('completed', todo.completed)
+
+    const checkbox = document.createElement('input')
+    checkbox.type = 'checkbox'
+    checkbox.checked = todo.completed
+    checkbox.addEventListener('change', () => this.toggleTodo(todo.id))
+
+    const label = document.createElement('span')
+    label.textContent = todo.text
+
+    item.append(checkbox, label)
     return item
   }
 }
