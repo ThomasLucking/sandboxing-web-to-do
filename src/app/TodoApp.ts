@@ -2,10 +2,12 @@ import { Todo } from '../models/Todo.ts'
 import type { TodoStorage } from '../storage/TodoStorage.ts'
 
 const EMPTY_TODO_ERROR = 'Please enter a to-do item before adding it.'
+const PAST_DUE_DATE_ERROR = 'Due date cannot be in the past.'
 
 export class TodoApp {
   private readonly todos: Todo[] = []
   private readonly input: HTMLInputElement
+  private readonly dateInput: HTMLInputElement
   private readonly addButton: HTMLButtonElement
   private readonly list: HTMLUListElement
   private readonly error: HTMLParagraphElement
@@ -14,6 +16,7 @@ export class TodoApp {
 
   constructor(
     input: HTMLInputElement,
+    dateInput: HTMLInputElement,
     addButton: HTMLButtonElement,
     list: HTMLUListElement,
     error: HTMLParagraphElement,
@@ -21,6 +24,7 @@ export class TodoApp {
     storage: TodoStorage,
   ) {
     this.input = input
+    this.dateInput = dateInput
     this.addButton = addButton
     this.list = list
     this.error = error
@@ -34,6 +38,7 @@ export class TodoApp {
       }
     })
     this.input.addEventListener('input', () => this.clearError())
+    this.dateInput.addEventListener('input', () => this.clearError())
     this.deleteAllButton.addEventListener('click', () => this.clearAll())
 
     this.todos.push(...this.storage.load())
@@ -48,11 +53,35 @@ export class TodoApp {
       return
     }
 
-    this.todos.push(new Todo(text))
+    const dueDate = this.readDueDate()
+
+    if (dueDate === 'invalid') {
+      this.showError(PAST_DUE_DATE_ERROR)
+      return
+    }
+
+    this.todos.push(new Todo(text, undefined, false, dueDate))
     this.storage.save(this.todos)
     this.input.value = ''
+    this.dateInput.value = ''
     this.clearError()
     this.render()
+  }
+
+  private readDueDate(): Temporal.PlainDate | undefined | 'invalid' {
+    const rawValue = this.dateInput.value
+
+    if (rawValue.length === 0) {
+      return undefined
+    }
+
+    const dueDate = Temporal.PlainDate.from(rawValue)
+
+    if (Temporal.PlainDate.compare(dueDate, Temporal.Now.plainDateISO()) < 0) {
+      return 'invalid'
+    }
+
+    return dueDate
   }
 
   private toggleTodo(id: number): void {
@@ -114,6 +143,8 @@ export class TodoApp {
     const label = document.createElement('span')
     label.textContent = todo.text
 
+    const dueDateParagraph = this.createDueDateElement(todo)
+
     const removeButton = document.createElement('button')
     removeButton.type = 'button'
     removeButton.className = 'remove-todo-button'
@@ -121,7 +152,24 @@ export class TodoApp {
     removeButton.setAttribute('aria-label', `Remove "${todo.text}"`)
     removeButton.addEventListener('click', () => this.removeTodo(todo.id))
 
-    item.append(checkbox, label, removeButton)
+    item.append(checkbox, label, dueDateParagraph, removeButton)
     return item
+  }
+
+  private createDueDateElement(todo: Todo): HTMLParagraphElement {
+    const paragraph = document.createElement('p')
+    paragraph.className = 'todo-due-date'
+
+    if (todo.dueDate) {
+      const dueDateText = todo.dueDate.toString()
+      const time = document.createElement('time')
+      time.dateTime = dueDateText
+      time.textContent = dueDateText
+      paragraph.append(time)
+    } else {
+      paragraph.textContent = 'no due date'
+    }
+
+    return paragraph
   }
 }
