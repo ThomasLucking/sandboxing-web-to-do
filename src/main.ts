@@ -1,5 +1,9 @@
 import './style.css'
+import { CategoryApiClient } from './api/CategoryApiClient.ts'
 import { TodoApiClient } from './api/TodoApiClient.ts'
+import { CategoryListRenderer } from './app/CategoryListRenderer.ts'
+import { CategoryManager } from './app/CategoryManager.ts'
+import { CategoryRepository } from './app/CategoryRepository.ts'
 import { TodoApp } from './app/TodoApp.ts'
 import { TodoListRenderer } from './app/TodoListRenderer.ts'
 import { TodoRepository } from './app/TodoRepository.ts'
@@ -32,4 +36,30 @@ const app = new TodoApp({
   loadingIndicator,
 })
 
-await app.init()
+const categoryNameInput = requireElement<HTMLInputElement>(
+  '#category-name-input',
+)
+const categoryColorInput = requireElement<HTMLInputElement>(
+  '#category-color-input',
+)
+const addCategoryButton = requireElement<HTMLButtonElement>(
+  '#add-category-button',
+)
+const categoryError = requireElement<HTMLParagraphElement>('#category-error')
+const categoriesList = requireElement<HTMLUListElement>('#categories-elements')
+
+const categoryApiClient = new CategoryApiClient()
+const categoryRepository = new CategoryRepository(categoryApiClient)
+const categoryRenderer = new CategoryListRenderer(categoriesList)
+
+const categoryManager = new CategoryManager({
+  nameInput: categoryNameInput,
+  colorInput: categoryColorInput,
+  addButton: addCategoryButton,
+  error: categoryError,
+  repository: categoryRepository,
+  renderer: categoryRenderer,
+  loadingIndicator,
+})
+
+await Promise.all([app.init(), categoryManager.init()])
