@@ -161,6 +161,8 @@ export class TodoApp {
     paragraph.className = 'todo-due-date'
 
     if (todo.dueDate) {
+      paragraph.classList.add(this.getDueDateUrgencyClass(todo.dueDate))
+
       const dueDateText = todo.dueDate.toString()
       const time = document.createElement('time')
       time.dateTime = dueDateText
@@ -171,5 +173,25 @@ export class TodoApp {
     }
 
     return paragraph
+  }
+
+  private getDueDateUrgencyClass(dueDate: Temporal.PlainDate): string {
+    const daysUntilDue = Temporal.Now.plainDateISO().until(dueDate, {
+      largestUnit: 'days',
+    }).days
+
+    if (daysUntilDue < 0) {
+      return 'todo-due-date--overdue'
+    }
+
+    if (daysUntilDue === 0) {
+      return 'todo-due-date--today'
+    }
+
+    if (daysUntilDue <= 4) {
+      return 'todo-due-date--soon'
+    }
+
+    return 'todo-due-date--later'
   }
 }
