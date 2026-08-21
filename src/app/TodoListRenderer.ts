@@ -17,26 +17,31 @@ export class TodoListRenderer {
     this.overdueMessage = overdueMessage
   }
 
-  render(
+  renderList(
     todos: readonly Todo[],
     categories: readonly Category[],
     handlers: TodoListHandlers,
   ): void {
-    let hasOverdueTodo = false
-
     const elements = todos.map((todo) => {
       const daysUntilDue = todo.dueDate
         ? this.getDaysUntilDue(todo.dueDate)
         : undefined
 
-      if (this.isOverdue(todo, daysUntilDue)) {
-        hasOverdueTodo = true
-      }
-
       return this.createTodoElement(todo, daysUntilDue, categories, handlers)
     })
 
     this.list.replaceChildren(...elements)
+  }
+
+  updateOverdueBanner(allTodos: readonly Todo[]): void {
+    const hasOverdueTodo = allTodos.some((todo) => {
+      const daysUntilDue = todo.dueDate
+        ? this.getDaysUntilDue(todo.dueDate)
+        : undefined
+
+      return this.isOverdue(todo, daysUntilDue)
+    })
+
     this.updateOverdueMessage(hasOverdueTodo)
   }
 

@@ -1,3 +1,4 @@
+import type { Todo } from '../models/Todo.ts'
 import type { LoadingIndicator } from '../ui/LoadingIndicator.ts'
 import type { CategoryRepository } from './CategoryRepository.ts'
 import type { TodoListRenderer } from './TodoListRenderer.ts'
@@ -19,6 +20,7 @@ export interface TodoAppDependencies {
   addButton: HTMLButtonElement
   error: HTMLParagraphElement
   deleteAllButton: HTMLButtonElement
+  searchInput: HTMLInputElement
   repository: TodoRepository
   categoryRepository: CategoryRepository
   renderer: TodoListRenderer
@@ -32,6 +34,7 @@ export class TodoApp {
   private readonly addButton: HTMLButtonElement
   private readonly error: HTMLParagraphElement
   private readonly deleteAllButton: HTMLButtonElement
+  private readonly searchInput: HTMLInputElement
   private readonly repository: TodoRepository
   private readonly categoryRepository: CategoryRepository
   private readonly renderer: TodoListRenderer
@@ -44,6 +47,7 @@ export class TodoApp {
     this.addButton = dependencies.addButton
     this.error = dependencies.error
     this.deleteAllButton = dependencies.deleteAllButton
+    this.searchInput = dependencies.searchInput
     this.repository = dependencies.repository
     this.categoryRepository = dependencies.categoryRepository
     this.renderer = dependencies.renderer
@@ -58,6 +62,7 @@ export class TodoApp {
     this.input.addEventListener('input', () => this.clearError())
     this.dateInput.addEventListener('input', () => this.clearError())
     this.deleteAllButton.addEventListener('click', () => this.handleClearAll())
+    this.searchInput.addEventListener('input', () => this.refresh())
   }
 
   async init(): Promise<void> {
@@ -167,14 +172,25 @@ export class TodoApp {
     this.error.hidden = true
   }
 
+  private filterBySearch(todos: readonly Todo[]): Todo[] {
+    const term = this.searchInput.value.trim().toLowerCase()
+
+    if (term.length === 0) {
+      return [...todos]
+    }
+
+    return todos.filter((todo) => todo.text.toLowerCase().includes(term))
+  }
+
   private refresh(): void {
-    this.renderer.render(
-      this.repository.getAll(),
-      this.categoryRepository.getAll(),
-      {
-        onToggle: (id) => this.handleToggle(id),
-        onRemove: (id) => this.handleRemove(id),
-      },
-    )
+    const allTodos = this.repository.getAll()
+    const visibleTodos = this.filterBySearch(allTodos)
+    const categories = this.categoryRepository.getAll()
+
+    this.renderer.renderList(visibleTodos, categories, {
+      onToggle: (id) => this.handleToggle(id),
+      onRemove: (id) => this.handleRemove(id),
+    })
+    this.renderer.updateOverdueBanner(allTodos)
   }
 }
