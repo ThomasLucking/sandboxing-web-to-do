@@ -58,20 +58,32 @@ h1 {
 
 .todo-form {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
 }
 
 #todo-input {
   flex: 1;
+  min-width: 10rem;
   padding: 0.6rem 0.75rem;
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   font-size: 1rem;
 }
 
-#todo-input:focus-visible {
+#todo-input:focus-visible,
+#todo-date-input:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 1px;
+}
+
+#todo-date-input {
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  color: var(--color-text);
+  background-color: var(--color-surface);
 }
 
 #add-todo-button {
@@ -122,6 +134,14 @@ h1 {
 #todo-elements li.completed span {
   color: var(--color-text-muted);
   text-decoration: line-through;
+}
+
+.todo-due-date {
+  flex-shrink: 0;
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  white-space: nowrap;
 }
 
 .remove-todo-button {
