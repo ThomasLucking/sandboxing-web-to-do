@@ -19,6 +19,7 @@ const addButton = requireElement<HTMLButtonElement>('#add-todo-button')
 const list = requireElement<HTMLUListElement>('#todo-elements')
 const error = requireElement<HTMLParagraphElement>('#todo-error')
 const deleteAllButton = requireElement<HTMLButtonElement>('#delete-all')
+const searchInput = requireElement<HTMLInputElement>('#todo-search-input')
 const overdueMessage = requireElement<HTMLParagraphElement>('#overdue-message')
 const loadingElement =
   requireElement<HTMLParagraphElement>('#loading-indicator')
@@ -62,6 +63,7 @@ const app = new TodoApp({
   addButton,
   error,
   deleteAllButton,
+  searchInput,
   repository,
   categoryRepository,
   renderer,
