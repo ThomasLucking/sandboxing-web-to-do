@@ -1,4 +1,5 @@
 import { Todo } from '../models/Todo.ts'
+import type { TodoStorage } from '../storage/TodoStorage.ts'
 
 const EMPTY_TODO_ERROR = 'Please enter a to-do item before adding it.'
 
@@ -8,17 +9,20 @@ export class TodoApp {
   private readonly addButton: HTMLButtonElement
   private readonly list: HTMLUListElement
   private readonly error: HTMLParagraphElement
+  private readonly storage: TodoStorage
 
   constructor(
     input: HTMLInputElement,
     addButton: HTMLButtonElement,
     list: HTMLUListElement,
     error: HTMLParagraphElement,
+    storage: TodoStorage,
   ) {
     this.input = input
     this.addButton = addButton
     this.list = list
     this.error = error
+    this.storage = storage
 
     this.addButton.addEventListener('click', () => this.addTodo())
     this.input.addEventListener('keydown', (event) => {
@@ -27,6 +31,9 @@ export class TodoApp {
       }
     })
     this.input.addEventListener('input', () => this.clearError())
+
+    this.todos.push(...this.storage.load())
+    this.render()
   }
 
   private addTodo(): void {
@@ -38,6 +45,7 @@ export class TodoApp {
     }
 
     this.todos.push(new Todo(text))
+    this.storage.save(this.todos)
     this.input.value = ''
     this.clearError()
     this.render()
