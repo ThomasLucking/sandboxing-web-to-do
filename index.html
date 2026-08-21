@@ -8,7 +8,7 @@
   </head>
   <body>
     <p id="overdue-message" hidden></p>
-    <main>
+    <main class="card">
       <h1>Web todolist app</h1>
       <p id="loading-indicator" hidden aria-live="polite">Loading…</p>
       <p id="todo-error" hidden></p>
@@ -20,6 +20,16 @@
       <ul id="todo-elements"></ul>
       <button id="delete-all" type="button">Delete All</button>
     </main>
+    <section class="card categories-section">
+      <h2>Categories</h2>
+      <p id="category-error" hidden></p>
+      <div class="category-form">
+        <input id="category-name-input" type="text" placeholder="Category name" />
+        <input id="category-color-input" type="color" value="#4f46e5" />
+        <button id="add-category-button" type="button">Add Category</button>
+      </div>
+      <ul id="categories-elements"></ul>
+    </section>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
