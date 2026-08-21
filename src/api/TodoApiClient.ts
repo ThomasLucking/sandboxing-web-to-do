@@ -12,13 +12,15 @@ const JSON_CONTENT_TYPE_HEADER = { 'Content-Type': 'application/json' }
  * school network, so this could not be verified from this sandbox. This
  * assumes a standard PostgREST convention: a `todos` table/resource with
  * columns `id` (integer, primary key, server-generated), `text` (text),
- * `completed` (boolean) and `due_date` (date, nullable).
+ * `completed` (boolean), `due_date` (date, nullable) and `category_id`
+ * (integer, nullable, assumed foreign key referencing `categories.id`).
  */
 interface TodoRecord {
   id: number
   text: string
   completed: boolean
   due_date: string | null
+  category_id: number | null
 }
 
 export class TodoApiClient {
@@ -38,6 +40,7 @@ export class TodoApiClient {
   async create(
     text: string,
     dueDate: Temporal.PlainDate | undefined,
+    categoryId: number | undefined,
   ): Promise<Todo> {
     const response = await fetch(`${this.baseUrl}/todos`, {
       method: 'POST',
@@ -49,6 +52,7 @@ export class TodoApiClient {
         text,
         completed: false,
         due_date: dueDate ? dueDate.toString() : null,
+        category_id: categoryId ?? null,
       }),
     })
     await this.assertOk(response, 'Failed to create to-do')
@@ -101,6 +105,7 @@ export class TodoApiClient {
       dueDate: record.due_date
         ? Temporal.PlainDate.from(record.due_date)
         : undefined,
+      categoryId: record.category_id ?? undefined,
     })
   }
 }

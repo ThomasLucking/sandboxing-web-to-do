@@ -1,4 +1,5 @@
 import type { LoadingIndicator } from '../ui/LoadingIndicator.ts'
+import type { CategoryRepository } from './CategoryRepository.ts'
 import type { TodoListRenderer } from './TodoListRenderer.ts'
 import type { TodoRepository } from './TodoRepository.ts'
 
@@ -14,10 +15,12 @@ const UPDATE_ERROR =
 export interface TodoAppDependencies {
   input: HTMLInputElement
   dateInput: HTMLInputElement
+  categorySelect: HTMLSelectElement
   addButton: HTMLButtonElement
   error: HTMLParagraphElement
   deleteAllButton: HTMLButtonElement
   repository: TodoRepository
+  categoryRepository: CategoryRepository
   renderer: TodoListRenderer
   loadingIndicator: LoadingIndicator
 }
@@ -25,20 +28,24 @@ export interface TodoAppDependencies {
 export class TodoApp {
   private readonly input: HTMLInputElement
   private readonly dateInput: HTMLInputElement
+  private readonly categorySelect: HTMLSelectElement
   private readonly addButton: HTMLButtonElement
   private readonly error: HTMLParagraphElement
   private readonly deleteAllButton: HTMLButtonElement
   private readonly repository: TodoRepository
+  private readonly categoryRepository: CategoryRepository
   private readonly renderer: TodoListRenderer
   private readonly loadingIndicator: LoadingIndicator
 
   constructor(dependencies: TodoAppDependencies) {
     this.input = dependencies.input
     this.dateInput = dependencies.dateInput
+    this.categorySelect = dependencies.categorySelect
     this.addButton = dependencies.addButton
     this.error = dependencies.error
     this.deleteAllButton = dependencies.deleteAllButton
     this.repository = dependencies.repository
+    this.categoryRepository = dependencies.categoryRepository
     this.renderer = dependencies.renderer
     this.loadingIndicator = dependencies.loadingIndicator
 
@@ -54,6 +61,8 @@ export class TodoApp {
   }
 
   async init(): Promise<void> {
+    this.populateCategoryOptions()
+
     this.loadingIndicator.show()
     try {
       await this.repository.load()
@@ -62,6 +71,15 @@ export class TodoApp {
       this.showError(LOAD_ERROR)
     } finally {
       this.loadingIndicator.hide()
+    }
+  }
+
+  private populateCategoryOptions(): void {
+    for (const category of this.categoryRepository.getAll()) {
+      const option = document.createElement('option')
+      option.value = String(category.id)
+      option.textContent = category.name
+      this.categorySelect.append(option)
     }
   }
 
@@ -80,12 +98,20 @@ export class TodoApp {
       return
     }
 
+    const categoryId = this.readCategoryId()
+
     await this.runMutation(async () => {
-      await this.repository.add(text, dueDate)
+      await this.repository.add(text, dueDate, categoryId)
       this.input.value = ''
       this.dateInput.value = ''
+      this.categorySelect.value = ''
       this.clearError()
     }, SAVE_ERROR)
+  }
+
+  private readCategoryId(): number | undefined {
+    const raw = this.categorySelect.value
+    return raw === '' ? undefined : Number(raw)
   }
 
   private readDueDate(): Temporal.PlainDate | undefined | 'invalid' {
@@ -142,9 +168,13 @@ export class TodoApp {
   }
 
   private refresh(): void {
-    this.renderer.render(this.repository.getAll(), {
-      onToggle: (id) => this.handleToggle(id),
-      onRemove: (id) => this.handleRemove(id),
-    })
+    this.renderer.render(
+      this.repository.getAll(),
+      this.categoryRepository.getAll(),
+      {
+        onToggle: (id) => this.handleToggle(id),
+        onRemove: (id) => this.handleRemove(id),
+      },
+    )
   }
 }
